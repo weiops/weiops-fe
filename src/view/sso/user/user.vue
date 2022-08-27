@@ -8,8 +8,8 @@
         <FormItem label="用户名" prop="username">
           <Input v-model="addUserForm.username" placeholder="输入用户名"></Input>
         </FormItem>
-        <FormItem label="邮箱" prop="mail">
-          <Input v-model="addUserForm.mail" placeholder="输入邮箱"></Input>
+        <FormItem label="邮箱" prop="email">
+          <Input v-model="addUserForm.email" placeholder="输入邮箱"></Input>
         </FormItem>
         <FormItem label="手机号" prop="phone">
           <Input v-model="addUserForm.phone" placeholder="输入手机号"></Input>
@@ -25,8 +25,8 @@
         <FormItem label="用户名" prop="username">
           <Input v-model="curUpdateUserForm.username" placeholder="输入用户名" disabled></Input>
         </FormItem>
-        <FormItem label="邮箱" prop="mail">
-          <Input v-model="curUpdateUserForm.mail" placeholder="输入邮箱"></Input>
+        <FormItem label="邮箱" prop="email">
+          <Input v-model="curUpdateUserForm.email" placeholder="输入邮箱"></Input>
         </FormItem>
         <FormItem label="手机号" prop="phone">
           <Input v-model="curUpdateUserForm.phone" placeholder="输入手机号"></Input>
@@ -46,7 +46,7 @@
     <div class="filter item">
       <Row :gutter="16">
         <Col span="6">
-          <Input search placeholder="搜索内容" v-model="param.key" @on-enter="loadUsers"/>
+          <Input search placeholder="搜索内容" v-model="params.keyword" @on-enter="loadUsers"/>
         </Col>
         <Col span="6" offset="12">
           <Span class="right">
@@ -76,13 +76,14 @@
 <script>
 
 import excel from '@/libs/excel'
+import { APIListUser } from '../../../api/sso/user'
 
 export default {
   name: 'User',
   data () {
     return {
-      param: {
-        key: ''
+      params: {
+        keyword: ''
       },
       columns: [
         {
@@ -95,7 +96,7 @@ export default {
         },
         {
           title: '邮箱地址',
-          key: 'mail'
+          key: 'email'
         },
         {
           title: '手机号',
@@ -110,7 +111,7 @@ export default {
         {
           id: 1,
           username: '品茶',
-          mail: 'zwhset@163.com',
+          email: 'zwhset@163.com',
           phone: '15088888888'
         }
       ],
@@ -119,16 +120,16 @@ export default {
       drawerAddUser: false,
       addUserForm: {
         username: '',
-        mail: '',
+        email: '',
         phone: ''
       },
       UserRules: {
         username: [
           { required: true, message: '账号不能为空', trigger: 'blur' }
         ],
-        mail: [
+        email: [
           { required: true, message: '邮箱地址不能为空', trigger: 'blur' },
-          { type: 'email', message: '错误的邮箱地址', trigger: 'blur' }
+          { type: 'eemail', message: '错误的邮箱地址', trigger: 'blur' }
         ],
         phone: [
           { required: true, message: '手机号不能为空', trigger: 'blur' }
@@ -138,7 +139,7 @@ export default {
       curUpdateUserForm: {
         id: 0,
         username: '',
-        mail: '',
+        email: '',
         phone: ''
       },
       addUserLoading: false,
@@ -152,6 +153,10 @@ export default {
       exportLoading: false
     }
   },
+  created () {
+    // load user data
+    this.loadUsers()
+  },
   methods: {
     /**
      * 载入用户列表
@@ -159,8 +164,14 @@ export default {
     loadUsers () {
       this.loading = true
       // 加载用户数据
+      APIListUser(this.params).then(res => {
+        this.data = res.data.data
+        this.loading = false
 
-      this.loading = false
+        console.log('userData: ', this.data)
+      }).catch(_ => {
+        this.loading = false
+      })
     },
     /**
      * 添加用户
@@ -224,12 +235,12 @@ export default {
         this.exportLoading = true
         const params = {
           title: ['ID', '用户名', '邮箱地址', '手机号'],
-          key: ['id', 'username', 'mail', 'phone'],
+          key: ['id', 'username', 'email', 'phone'],
           data: this.data.map((row) => {
             return {
               id: row.id,
               username: row.username,
-              mail: row.mail,
+              email: row.email,
               phone: row.phone
             }
           }),
