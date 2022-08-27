@@ -14,6 +14,13 @@
         </span>
       </Input>
     </FormItem>
+    <FormItem prop="token">
+      <Input type="token" v-model="form.token" placeholder="两步认证">
+        <span slot="prepend">
+          <Icon :size="14" type="ios-settings"></Icon>
+        </span>
+      </Input>
+    </FormItem>
     <FormItem>
       <Button @click="handleSubmit" type="primary" long>登录</Button>
     </FormItem>
@@ -38,13 +45,22 @@ export default {
           { required: true, message: '密码不能为空', trigger: 'blur' }
         ]
       }
+    },
+    tokenRules: {
+      type: Array,
+      default: () => {
+        return [
+          { required: true, message: '两步认证不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   data () {
     return {
       form: {
         userName: 'super_admin',
-        password: ''
+        password: '',
+        token: ''
       }
     }
   },
@@ -52,7 +68,8 @@ export default {
     rules () {
       return {
         userName: this.userNameRules,
-        password: this.passwordRules
+        password: this.passwordRules,
+        token: this.tokenRules
       }
     }
   },
