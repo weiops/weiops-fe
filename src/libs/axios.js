@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Notice } from 'iview'
 
 class HttpRequest {
   constructor (baseUrl = baseURL) {
@@ -48,7 +49,10 @@ class HttpRequest {
           request: { responseURL: config.url }
         }
       }
-      addErrorLog(errorInfo)
+      Notice.error({
+        title: error.response.data.title,
+        desc: error.response.data.message
+      })
       return Promise.reject(error)
     })
   }

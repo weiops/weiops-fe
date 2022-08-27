@@ -32,7 +32,7 @@
           <Input v-model="curUpdateUserForm.phone" placeholder="输入手机号"></Input>
         </FormItem>
         <FormItem>
-          <Button type="primary" @click="handleChangeUser('addFormRef')" long :loading="updateUserLoading">修改</Button>
+          <Button type="primary" @click="handleChangeUser('updateFormRef')" long :loading="updateUserLoading">修改</Button>
         </FormItem>
       </Form>
     </Drawer>
@@ -76,7 +76,7 @@
 <script>
 
 import excel from '@/libs/excel'
-import { APIListUser } from '../../../api/sso/user'
+import { APICreateUser, APIDeleteUser, APIListUser, APIUpdateUser } from '../../../api/sso/user'
 
 export default {
   name: 'User',
@@ -107,14 +107,7 @@ export default {
           slot: 'action'
         }
       ],
-      data: [
-        {
-          id: 1,
-          username: '品茶',
-          email: 'zwhset@163.com',
-          phone: '15088888888'
-        }
-      ],
+      data: [],
       loading: false,
       height: 800,
       drawerAddUser: false,
@@ -129,7 +122,7 @@ export default {
         ],
         email: [
           { required: true, message: '邮箱地址不能为空', trigger: 'blur' },
-          { type: 'eemail', message: '错误的邮箱地址', trigger: 'blur' }
+          { type: 'email', message: '错误的邮箱地址', trigger: 'blur' }
         ],
         phone: [
           { required: true, message: '手机号不能为空', trigger: 'blur' }
@@ -167,8 +160,6 @@ export default {
       APIListUser(this.params).then(res => {
         this.data = res.data.data
         this.loading = false
-
-        console.log('userData: ', this.data)
       }).catch(_ => {
         this.loading = false
       })
@@ -180,15 +171,16 @@ export default {
       this.$refs[name].validate((valid) => {
         if (valid) {
           this.addUserLoading = true
-          setTimeout(() => {
-            this.$Message.success('用户添加成功')
+          APICreateUser(this.addUserForm).then(_ => {
+            this.$Message.success(`用户 ${this.addUserForm.username} 添加成功`)
             this.addUserLoading = false
-          }, 2000)
+            this.drawerAddUser = false
+            this.loadUsers()
+          }).catch(_ => {
+            this.addUserLoading = false
+          })
         } else {
           this.drawerAddUser = false
-          setTimeout(() => {
-            this.drawerAddUser = true
-          }, 150)
         }
       })
     },
@@ -202,13 +194,21 @@ export default {
     /**
      * 修改用户
      */
-    handleChangeUser () {
-      // curUpdateUserForm
-      this.updateUserLoading = true
-      setTimeout(() => {
-        this.$Message.success(`修改用户 ${this.curUpdateUserForm.username} 成功`)
-        this.updateUserLoading = false
-      }, 500)
+    handleChangeUser (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          // curUpdateUserForm
+          this.updateUserLoading = true
+          APIUpdateUser(this.curUpdateUserForm).then(_ => {
+            this.$Message.success(`修改用户 ${this.curUpdateUserForm.username} 成功`)
+            this.updateUserLoading = false
+            this.drawerUpdateUser = false
+            this.loadUsers()
+          }).catch(_ => {
+            this.updateUserLoading = false
+          })
+        }
+      })
     },
     /**
      * 打开删除用户的抽屉
@@ -222,10 +222,14 @@ export default {
      */
     handleDeleteUser () {
       this.deleteUserLoading = true
-      setTimeout(() => {
+      APIDeleteUser(this.curDeleteUserForm.id).then(_ => {
         this.$Message.success(`删除用户 ${this.curDeleteUserForm.username} 成功`)
         this.deleteUserLoading = false
-      }, 1000)
+        this.drawerDeleteUser = false
+        this.loadUsers()
+      }).catch(_ => {
+        this.deleteUserLoading = false
+      })
     },
     /**
      * 导出数据
