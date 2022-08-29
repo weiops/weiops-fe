@@ -10,6 +10,14 @@ export const APIListUser = (params) => {
   })
 }
 
+export const APILoginUser = (data) => {
+  return axios.request({
+    url: `${url}login/`,
+    data: data,
+    method: 'POST'
+  })
+}
+
 export const APICreateUser = (data) => {
   return axios.request({
     url: `${url}create/`,
