@@ -32,20 +32,39 @@ export default [
     redirect: '/home',
     component: Main,
     meta: {
-      hideInMenu: true,
       notCache: true
     },
     children: [
       {
         path: '/home',
-        name: 'home',
+        name: '首页',
         meta: {
-          hideInMenu: true,
           title: '首页',
           notCache: true,
           icon: 'md-home'
         },
-        component: () => import('@/view/single-page/home')
+        component: () => import('@/view/dashboard/dashboard.vue')
+      }
+    ]
+  },
+  {
+    path: '/relation',
+    name: '关系化',
+    meta: {
+      icon: 'md-person',
+      title: '关系化',
+      showAlways: true
+    },
+    component: Main,
+    children: [
+      {
+        path: 'relation',
+        name: '关系化',
+        meta: {
+          icon: 'md-person',
+          title: '关系化'
+        },
+        component: () => import('@/view/relation/index.vue')
       }
     ]
   },
