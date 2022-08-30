@@ -22,7 +22,7 @@
 
     <Drawer title="修改用户" width="600" :closable="false" v-model="drawerUpdateUser">
       <Form ref="updateFormRef" :model="curUpdateUserForm" :rules="UserRules" :label-width="80">
-        <FormItem label="用户名" prop="username">
+        <FormItem label="用户名" prop="changeUsername">
           <Input v-model="curUpdateUserForm.username" placeholder="输入用户名" disabled></Input>
         </FormItem>
         <FormItem label="邮箱" prop="email">
