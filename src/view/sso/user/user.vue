@@ -118,7 +118,24 @@ export default {
       },
       UserRules: {
         username: [
-          { required: true, message: '账号不能为空', trigger: 'blur' }
+          { required: true, message: '用户名不能为空', trigger: 'blur' },
+          {
+            type: 'string',
+            trigger: 'blur',
+            validator (rule, value) {
+              return new Promise((resolve, reject) => {
+                APIListUser({ username: value }).then(res => {
+                  if (res.data.data.length === 0) {
+                    resolve()
+                  } else {
+                    reject(new Error('用户名已经存在'))
+                  }
+                }).catch(_ => {
+                  reject(new Error('校验接口请求失败'))
+                })
+              })
+            }
+          }
         ],
         email: [
           { required: true, message: '邮箱地址不能为空', trigger: 'blur' },
